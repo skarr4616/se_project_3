@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import {useNavigate} from "react-router-dom";
+
 import {
     Card,
     Button,
@@ -12,30 +14,44 @@ import {
 class Homepage extends Component {
     constructor(props) {
         super(props);
+        this.exp_id= "0";
+        
+        this.handleButtonClick = this.handleButtonClick.bind(this);
     }
+    handleButtonClick(e){
+        this.exp_id = e.target.value;
+        console.log("Starting experiment with id: "+this.exp_id);
+        this.props.history("/experiment/"+this.exp_id);
 
+    }
     cardsData = [
-        {
+        {  
+            id: "1",
             title: "Experiment 1",
             description: "Description for card 1",
         },
         {
+            id: "2",
             title: "Experiment 2",
             description: "Description for card 2",
         },
         {
+            id: "3",
             title: "Experiment 3",
             description: "Description for card 3",
         },
         {
+            id: "4",
             title: "Experiment 4",
             description: "Description for card 4",
         },
         {
+            id: "5",
             title: "Experiment 5",
             description: "Description for card 5",
         },
         {
+            id: "6",
             title: "Experiment 6",
             description: "Description for card 6",
         },
@@ -82,6 +98,8 @@ class Homepage extends Component {
                                         <Button
                                             variant="primary"
                                             className="mr-2"
+                                            value = {card.id}
+                                            onClick={this.handleButtonClick}
                                         >
                                             Start
                                         </Button>
@@ -99,4 +117,6 @@ class Homepage extends Component {
     }
 }
 
-export default Homepage;
+export default (props) => (
+    <Homepage history={useNavigate()} />
+  );

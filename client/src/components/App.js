@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import Experiment from "./Experiment/Experiment";
+import VanishingRod from "./Experiment/VanishingRod";
 import Homepage from "./Homepage/Homepage";
 
 export class App extends Component {
@@ -8,7 +10,9 @@ export class App extends Component {
         return (
             <Router>
                 <Routes>
-                    <Route path="/" element={<Homepage />} />
+                    <Route exact path="/" element={<Homepage />} />
+                    <Route path='/experiment/1' element={<VanishingRod/>} />
+                    <Route path='/experiment/2' element={<Experiment props={{exp_id:2}}/>} />
                 </Routes>
             </Router>
         );
