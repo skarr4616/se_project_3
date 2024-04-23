@@ -44,25 +44,6 @@ class Homepage extends Component {
     render() {
         return (
             <>
-                <Navbar bg="light" expand="lg">
-                    <Container>
-                        <Navbar.Brand
-                            className="mr-auto"
-                            style={{ fontSize: "24px", fontWeight: "bold" }}
-                        >
-                            Remote Labs
-                        </Navbar.Brand>
-                        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                        <Navbar.Collapse id="basic-navbar-nav">
-                            <Nav className="ml-auto">
-                                <Nav.Link style={{ fontSize: "18px" }}>
-                                    Profile
-                                </Nav.Link>
-                                {/* Add your logout functionality here */}
-                            </Nav>
-                        </Navbar.Collapse>
-                    </Container>
-                </Navbar>
                 <Container>
                     <Row>
                         <div className="d-flex flex-wrap justify-content-between">
