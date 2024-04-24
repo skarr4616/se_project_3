@@ -1,9 +1,7 @@
 from django.urls import path
 from .views import index
 
-print("Reached here")
+print("Reached here brother")
 urlpatterns = [
     path('', index),
-    path('signup/', index),
-    path('signin/', index),
 ]
