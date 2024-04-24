@@ -1,14 +1,6 @@
-import React, { Component, useRef } from "react";
+import React, { Component } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-    Card,
-    Button,
-    Nav,
-    Row,
-    Navbar,
-    Col,
-    Container,
-} from "react-bootstrap";
+import "./vanish.css";
 
 class VanishingRod extends Component {
     constructor(props) {
@@ -54,7 +46,7 @@ class VanishingRod extends Component {
         else {
             clearInterval(this.Ref.current);
             this.handleExit();
-            
+
         }
     };
 
@@ -74,8 +66,6 @@ class VanishingRod extends Component {
         this.Ref.current = id;
 
     };
-
-
 
     // We can use componentDidMount so that when the component
     // mount the timer will start as soon as possible
@@ -142,17 +132,47 @@ class VanishingRod extends Component {
     render() {
         return (
             <>
-                <div class="container d-flex justify-content-center align-items-center mh-100 bg-sucess">
-                    <div class="mw-100 p-3">
-                        <h1>Vanishing Rod Experiment</h1>
-                        <h3>Countdown Timer Using React JS</h3>
-                        <h2>{this.state.timer}</h2>
+
+                <nav role="navigation">
+                    <div id="menuToggle">
+
+                        <input type="checkbox" />
+
+                        <span></span>
+                        <span></span>
+                        <span></span>
+
+                        <ul id="menu">
+                            <div class="up_half">
+                                <h2>How to use this dashboard</h2>
+                            </div>
+
+                            <li>Use the Up and Down arrows in the control widget to control the position of the glass rods.
+                                You can do this multiple times to see the rod vanishing in the left beaker containing
+                                sunflower oil while it remains clearly visible in the right beaker containing water.</li>
+                        </ul>
+                    </div>
+                    <label id="inst">Instructions</label>
+                </nav>
+                <div class="range1">
+                    <nav class="navbar">
+                        <a id="focal_head" href="#focal">Vanishing Rod</a>
+                        <a id="session" type="button" onClick={this.handleExit} >Leave Session</a>
+                        <a id="demo">{this.state.timer}</a>
+                    </nav>
+                    <div class="slidervalue1">
+                        <span id="us">0</span>
                     </div>
 
-                    <div class="mw-100 p-3">
+                    <div class="field1">
+                        <div class="value left">Up</div>
+                        <div class="value right">Down</div>
+                    </div>
+                    <button type="button" value="Down" onClick={this.handleControlClick} class="btn_plus" id="btn_plus1">▼</button>
+                    <button type="button" value="Up" onClick={this.handleControlClick} class="btn_minus" id="btn_minus1">▲</button>
+                    <div class="stream">
                         <iframe
-                            width="560"
-                            height="315"
+                            width="640" height="360"
                             src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=SiXViXzuqsNumNzw&autoplay=1"
                             title="YouTube video player"
                             frameborder="0"
@@ -160,19 +180,7 @@ class VanishingRod extends Component {
                             referrerpolicy="strict-origin-when-cross-origin"
                             allowfullscreen
                         ></iframe>
-                    </div>
-                    <div class="mw-100 p-3">
-                        <Button value="Up" onClick={this.handleControlClick}>
-                            Up
-                        </Button>
-                        <Button value="Down" onClick={this.handleControlClick}>
-                            Down
-                        </Button>
-                    </div>
-                    <div class="mw-100 p-3">
-                        <Button value="Exit" onClick={this.handleExit}>
-                            Exit
-                        </Button>
+
                     </div>
                 </div>
             </>
