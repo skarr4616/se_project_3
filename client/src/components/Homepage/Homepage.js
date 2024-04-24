@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import {
     Card,
@@ -14,18 +14,33 @@ import {
 class Homepage extends Component {
     constructor(props) {
         super(props);
-        this.exp_id= "0";
-        
+        this.exp_id = "0";
+
         this.handleButtonClick = this.handleButtonClick.bind(this);
     }
-    handleButtonClick(e){
+    handleButtonClick(e) {
         this.exp_id = e.target.value;
-        console.log("Starting experiment with id: "+this.exp_id);
-        this.props.history("/experiment/"+this.exp_id);
+        const requestOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            // body: JSON.stringify({ exp_id: 1 , action: "status"})
+        };
+        fetch('/api/exp?exp_id=1&action=status', requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                if (data == "1") {
+                    console.log("Entering Experiment");
+                    this.props.history("/experiment/"+this.exp_id);
+                }
+                else{
+                    alert("Experiment is Offline");
+
+                }
+            });
 
     }
     cardsData = [
-        {  
+        {
             id: "1",
             title: "Experiment 1",
             description: "Description for card 1",
@@ -98,7 +113,7 @@ class Homepage extends Component {
                                         <Button
                                             variant="primary"
                                             className="mr-2"
-                                            value = {card.id}
+                                            value={card.id}
                                             onClick={this.handleButtonClick}
                                         >
                                             Start
@@ -119,4 +134,4 @@ class Homepage extends Component {
 
 export default (props) => (
     <Homepage history={useNavigate()} />
-  );
+);
