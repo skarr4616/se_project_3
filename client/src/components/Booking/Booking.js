@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import { Navigate } from "react-router-dom";
 import dayjs from "dayjs";
-import Sidebar from "./Sidebar";
 import { Navbar } from "react-bootstrap";
+
+import Sidebar from "./Sidebar";
 import TimeSlots from "./TimeSlots";
 
 export class Booking extends Component {
@@ -12,26 +13,27 @@ export class Booking extends Component {
             email: localStorage.getItem("email"),
             date: dayjs(new Date()),
             time: null,
-            selectedOption: "Experiment 6",
+            selectedOption: "Vanishing Rod",
             bookedSlots: [],
-            experimentList: [
-                "Experiment 1",
-                "Experiment 2",
-                "Experiment 3",
-                "Experiment 4",
-                "Experiment 5",
-                "Experiment 6",
-            ],
+            experimentList: ["Vanishing Rod"],
             navigate: false,
         };
     }
 
     componentDidMount() {
+        let code = null;
+        switch (this.state.selectedOption) {
+            case "Vanishing Rod":
+                code = "YQIBZF";
+                break;
+        }
+
         const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 slot_date: this.state.date.format("YYYY-MM-DD"),
+                experiment_code: code,
             }),
         };
 
@@ -49,11 +51,19 @@ export class Booking extends Component {
     };
 
     handleDateChange = (e) => {
+        let code = null;
+        switch (this.state.selectedOption) {
+            case "Vanishing Rod":
+                code = "YQIBZF";
+                break;
+        }
+
         const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 slot_date: e.format("YYYY-MM-DD"),
+                experiment_code: code,
             }),
         };
 
@@ -78,6 +88,13 @@ export class Booking extends Component {
     };
 
     handleBookingConfirmation = () => {
+        let code = null;
+        switch (this.state.selectedOption) {
+            case "Vanishing Rod":
+                code = "YQIBZF";
+                break;
+        }
+
         const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -85,7 +102,7 @@ export class Booking extends Component {
                 email: this.state.email,
                 slot_date: this.state.date.format("YYYY-MM-DD"),
                 slot_time: this.state.time,
-                experiment: this.state.selectedOption,
+                experiment_code: code,
             }),
         };
 

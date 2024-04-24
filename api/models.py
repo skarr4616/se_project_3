@@ -23,12 +23,15 @@ class User(models.Model):
 
 class Experiments(models.Model):
     experiment_code = models.CharField(max_length=8, unique=True, default=generate_unique_code)
-    experiment_name = models.CharField(max_length=100)
+    experiment_name = models.CharField(max_length=100, null=False)
+    experiment_status = models.BooleanField(default=False, null=False)
+    experiment_key = models.CharField(max_length=100, null=False)
     experiment_description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     
 class SlotBookings(models.Model):
     email = models.ForeignKey(User, on_delete=models.CASCADE, to_field='email')
+    experiment_code = models.ForeignKey(Experiments, on_delete=models.CASCADE, to_field='experiment_code')
     slot_date = models.DateField()
     slot_time = models.TimeField()
     created_at = models.DateTimeField(auto_now_add=True)

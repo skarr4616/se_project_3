@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Card, Nav, Button, Row, Navbar, Container } from "react-bootstrap";
-import { Navigate, Link } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import "./homepage.css";
 
 class Homepage extends Component {
@@ -8,52 +8,55 @@ class Homepage extends Component {
         super(props);
         this.state = {
             username: localStorage.getItem("username"),
-            navigateBook: false,
+            experimentData: [],
         };
     }
 
-    cardsData = [
-        {
-            title: "Experiment 1",
-            description: "Description for card 1",
-        },
-        {
-            title: "Experiment 2",
-            description: "Description for card 2",
-        },
-        {
-            title: "Experiment 3",
-            description: "Description for card 3",
-        },
-        {
-            title: "Experiment 4",
-            description: "Description for card 4",
-        },
-        {
-            title: "Experiment 5",
-            description: "Description for card 5",
-        },
-        {
-            title: "Experiment 6",
-            description: "Description for card 6",
-        },
-    ];
+    componentDidMount() {
+        const requestOptions = {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        };
+
+        fetch("/api/exp", requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+                this.setState({ experimentData: data });
+            });
+    }
 
     handleBookButton = (e) => {
-        this.setState({
-            navigateBook: true,
-        });
+        this.props.history("/book");
+    };
+
+    handleStartButton = (e) => {
+        switch (e.target.value) {
+            case "YQIBZF":
+                const requestOptions = {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                };
+
+                fetch("/api/exp?exp_code=YQIBZF&action=status", requestOptions)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data == "1") {
+                            console.log("Entering Experiment");
+                            this.props.history("/experiment/1");
+                        } else {
+                            alert("Experiment is Offline");
+                        }
+                    });
+                break;
+        }
     };
 
     render() {
         console.log("Rendering homepage");
+        console.log(this.state);
 
         if (!this.state.username) {
             return <Navigate to="/login" />;
-        }
-
-        if (this.state.navigateBook) {
-            return <Navigate to="/book" />;
         }
 
         return (
@@ -80,7 +83,7 @@ class Homepage extends Component {
                 <Container>
                     <Row>
                         <div className="d-flex flex-wrap justify-content-between">
-                            {this.cardsData.map((card, index) => (
+                            {this.state.experimentData.map((card, index) => (
                                 <Card
                                     key={index}
                                     style={{
@@ -89,13 +92,17 @@ class Homepage extends Component {
                                     }}
                                 >
                                     <Card.Body>
-                                        <Card.Title>{card.title}</Card.Title>
+                                        <Card.Title>
+                                            {card.experiment_name}
+                                        </Card.Title>
                                         <Card.Text>
-                                            {card.description}
+                                            {card.experiment_description}
                                         </Card.Text>
                                         <Button
                                             variant="primary"
                                             className="mr-2"
+                                            value={card.experiment_code}
+                                            onClick={this.handleStartButton}
                                         >
                                             Start
                                         </Button>
@@ -118,4 +125,4 @@ class Homepage extends Component {
     }
 }
 
-export default Homepage;
+export default (props) => <Homepage history={useNavigate()} />;
