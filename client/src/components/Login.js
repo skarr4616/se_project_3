@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
+
 
 class Login extends Component {
     constructor(props) {
@@ -35,11 +37,16 @@ class Login extends Component {
                     console.log("Login successful");
                     return response.json();
                 }
+                else {
+                    console.log("Login failed");
+                    alert("Login failed");
+                }
             })
             .then((data) => {
                 console.log(data);
                 localStorage.setItem("username", data.username);
                 localStorage.setItem("email", data.email);
+                this.props.history("/");
             });
     };
 
@@ -75,4 +82,4 @@ class Login extends Component {
     }
 }
 
-export default Login;
+export default (props) => <Login history={useNavigate()} />;

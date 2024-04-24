@@ -1,6 +1,8 @@
-from django.db import models
-import string
 import random
+import string
+
+from django.db import models
+
 
 def generate_unique_code():
     length = 6
@@ -21,6 +23,9 @@ class User(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f"{self.username} - {self.email}"
+
 class Experiments(models.Model):
     experiment_code = models.CharField(max_length=8, unique=True, default=generate_unique_code)
     experiment_name = models.CharField(max_length=100, null=False)
@@ -28,6 +33,10 @@ class Experiments(models.Model):
     experiment_key = models.CharField(max_length=100, null=False)
     experiment_description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True, null=False)
+    
+    def __str__(self):
+        return f"{self.experiment_name} - {self.experiment_code}"
     
 class SlotBookings(models.Model):
     email = models.ForeignKey(User, on_delete=models.CASCADE, to_field='email')

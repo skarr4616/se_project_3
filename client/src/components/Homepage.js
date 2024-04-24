@@ -18,9 +18,9 @@ class Homepage extends Component {
             headers: { "Content-Type": "application/json" },
         };
 
-        fetch("/api/exp", requestOptions)
+        fetch("/api/exp?action=list", requestOptions)
             .then((response) => response.json())
-            .then((data) => {
+            .then((data) => { console.log(data);
                 this.setState({ experimentData: data });
             });
     }
@@ -40,11 +40,29 @@ class Homepage extends Component {
                 fetch("/api/exp?exp_code=YQIBZF&action=status", requestOptions)
                     .then((response) => response.json())
                     .then((data) => {
-                        if (data == "1") {
+                        if (data == "2") {
                             console.log("Entering Experiment");
+                            const resuestOptions = {
+                                method: "PUT",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                    exp_id: "YQIBZF",
+                                    action: "status",
+                                    value: "enter",
+                                    method: "status",
+                                }),
+                            };
+                            fetch("/api/exp", resuestOptions)
+                                .then((response) => response.json())
+                                .then((data) => console.log(data));
+                            let start_time = new Date();
+                            localStorage.setItem("timer", start_time.toString());
                             this.props.history("/experiment/1");
-                        } else {
-                            alert("Experiment is Offline");
+                        } else if (data == "1") {
+                            alert("Experiment is in already use");
+                        }
+                        else{
+                            alert("Experiment is not offline");
                         }
                     });
                 break;
@@ -76,6 +94,7 @@ class Homepage extends Component {
                                     {this.state.username}
                                 </Nav.Link>
                                 {/* Add your logout functionality here */}
+                                {/* Add admin access button */}
                             </Nav>
                         </Navbar.Collapse>
                     </Container>

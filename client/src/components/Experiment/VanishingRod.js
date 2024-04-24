@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     Card,
@@ -13,22 +13,96 @@ import {
 class VanishingRod extends Component {
     constructor(props) {
         super(props);
+        this.Ref = React.createRef();
+
+        // The state for our timer
         this.state = {
-            rod_state: "up",
+            timer: "00:00:00",
         };
+
+
     }
 
-    qpiRequest(e) {
-        const requestOptions = {
+    getTimeRemaining = (e) => {
+        const total = Date.parse(e) - Date.parse(new Date());
+        const seconds = Math.floor((total / 1000) % 60);
+        const minutes = Math.floor((total / 1000 / 60) % 60);
+        const hours = Math.floor((total / 1000 / 60 / 60) % 24);
+        return {
+            total,
+            hours,
+            minutes,
+            seconds,
+        };
+    };
+
+    startTimer = (e) => {
+        let { total, hours, minutes, seconds } = this.getTimeRemaining(e);
+        if (total >= 0) {
+            // update the timer
+            // check if less than 10 then we need to
+            // add '0' at the beginning of the variable
+            this.setState({
+                timer:
+                    (hours > 9 ? hours : "0" + hours) +
+                    ":" +
+                    (minutes > 9 ? minutes : "0" + minutes) +
+                    ":" +
+                    (seconds > 9 ? seconds : "0" + seconds),
+            });
+        }
+        else {
+            clearInterval(this.Ref.current);
+            this.handleExit();
+            
+        }
+    };
+
+    clearTimer = (e) => {
+        // If you adjust it you should also need to
+        // adjust the Endtime formula we are about
+        // to code next
+        this.setState({ timer: "00:00:00" });
+        // If you try to remove this line the
+        // updating of timer Variable will be
+        // after 1000ms or 1sec
+
+        const id = setInterval(() => {
+            this.startTimer(e);
+        }, 1000);
+
+        this.Ref.current = id;
+
+    };
+
+
+
+    // We can use componentDidMount so that when the component
+    // mount the timer will start as soon as possible
+    componentDidMount() {
+        let start_time = localStorage.getItem("timer");
+        let deadline = new Date(start_time);
+        deadline.setSeconds(deadline.getSeconds() + 10);
+        this.clearTimer(deadline);
+    }
+
+    handleExit = (e) => {
+        console.log("Exiting experiment");
+        const resuestOptions = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ exp_id: 1, action: "v3", value: "0" }),
+            body: JSON.stringify({
+                exp_id: "YQIBZF",
+                action: "status",
+                value: "exit",
+                method: "status",
+            }),
         };
-        fetch("/api/exp", requestOptions)
+        fetch("/api/exp", resuestOptions)
             .then((response) => response.json())
             .then((data) => console.log(data));
-    }
-
+        this.props.history("/");
+    };
     handleControlClick = (e) => {
         if (e.target.value === "Up") {
             const resuestOptions = {
@@ -38,11 +112,13 @@ class VanishingRod extends Component {
                     exp_id: "YQIBZF",
                     action: "v3",
                     value: "0",
+                    method: 'blynk',
                 }),
             };
             fetch("/api/exp", resuestOptions)
                 .then((response) => response.json())
                 .then((data) => console.log(data));
+
         } else if (e.target.value === "Down") {
             const resuestOptions = {
                 method: "PUT",
@@ -51,14 +127,15 @@ class VanishingRod extends Component {
                     exp_id: "YQIBZF",
                     action: "v3",
                     value: "1",
+                    method: 'blynk',
                 }),
             };
             fetch("/api/exp", resuestOptions)
                 .then((response) => response.json())
                 .then((data) => console.log(data));
-        } else if (e.target.value === "Exit") {
-            console.log("Exiting experiment");
-            this.props.history("/");
+
+        } else {
+            console.log("Invalid Input");
         }
     };
 
@@ -67,7 +144,9 @@ class VanishingRod extends Component {
             <>
                 <div class="container d-flex justify-content-center align-items-center mh-100 bg-sucess">
                     <div class="mw-100 p-3">
-                        <p>Vanishing Rod Experiment</p>
+                        <h1>Vanishing Rod Experiment</h1>
+                        <h3>Countdown Timer Using React JS</h3>
+                        <h2>{this.state.timer}</h2>
                     </div>
 
                     <div class="mw-100 p-3">
@@ -91,7 +170,7 @@ class VanishingRod extends Component {
                         </Button>
                     </div>
                     <div class="mw-100 p-3">
-                        <Button value="Exit" onClick={this.handleControlClick}>
+                        <Button value="Exit" onClick={this.handleExit}>
                             Exit
                         </Button>
                     </div>
