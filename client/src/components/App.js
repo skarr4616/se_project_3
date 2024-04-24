@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import { render } from "react-dom";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
-import Homepage from "./Homepage";
-import Signup from "./Signup";
-import Login from "./Login";
+import Homepage from "./Homepage/Homepage";
+import Signup from "./Containers/Signup";
+import Login from "./Containers/Login";
 import Activate from "./Containers/Activate";
 import ResetPassword from "./Containers/ResetPassword";
 import ResetPasswordConfirm from "./Containers/ResetPasswordConfirm";
@@ -27,6 +27,15 @@ export class App extends Component {
                     <Route path="/book" element={<Booking />} />
                     <Route path="/bookings" element={<ListBooking />} />
                     <Route path="/experiment/1" element={<VanishingRod />} />
+                    <Route
+                        path="/activate/:uid/:token"
+                        element={<Activate />}
+                    />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route
+                        path="/password/reset/confirm/:uid/:token"
+                        element={<ResetPasswordConfirm />}
+                    />
                 </Routes>
             </Router>
         );

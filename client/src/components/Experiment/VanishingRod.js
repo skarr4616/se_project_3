@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
     Card,
     Button,
@@ -21,7 +22,10 @@ class VanishingRod extends Component {
     qpiRequest(e) {
         const requestOptions = {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.props.user.access}`,
+            },
             body: JSON.stringify({ exp_id: 1, action: "v3", value: "0" }),
         };
         fetch("/api/exp", requestOptions)
@@ -33,7 +37,10 @@ class VanishingRod extends Component {
         if (e.target.value === "Up") {
             const resuestOptions = {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${this.props.user.access}`,
+                },
                 body: JSON.stringify({
                     exp_id: "YQIBZF",
                     action: "v3",
@@ -46,7 +53,10 @@ class VanishingRod extends Component {
         } else if (e.target.value === "Down") {
             const resuestOptions = {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${this.props.user.access}`,
+                },
                 body: JSON.stringify({
                     exp_id: "YQIBZF",
                     action: "v3",
@@ -101,4 +111,9 @@ class VanishingRod extends Component {
     }
 }
 
-export default (props) => <VanishingRod history={useNavigate()} />;
+export default (props) => (
+    <VanishingRod
+        history={useNavigate()}
+        user={useSelector((state) => state.auth.user)}
+    />
+);

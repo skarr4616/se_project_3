@@ -11,7 +11,7 @@ export class Booking extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            email: localStorage.getItem("email"),
+            email: "",
             date: dayjs(new Date()),
             time: null,
             selectedOption: "Vanishing Rod",
@@ -29,15 +29,30 @@ export class Booking extends Component {
     }
 
     componentDidMount() {
+        if (!this.props.user) {
+            return <Navigate to="/login" />;
+        }
+
         const code = this.getExperimentCode(this.state.selectedOption);
 
         const requestOptions = {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.props.user.access}`,
+            },
             body: JSON.stringify({
                 slot_date: this.state.date.format("YYYY-MM-DD"),
                 experiment_code: code,
             }),
+        };
+
+        const config = {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.props.user.access}`,
+            },
         };
 
         fetch("/api/list", requestOptions)
@@ -46,6 +61,13 @@ export class Booking extends Component {
                 console.log(data);
                 const newBookedSlots = data.map((slot) => slot.slot_time);
                 this.setState({ bookedSlots: newBookedSlots });
+            })
+            .then(() => {
+                fetch("/auth/users/me/", config)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        this.setState({ email: data.email });
+                    });
             });
     }
 
@@ -66,7 +88,10 @@ export class Booking extends Component {
 
         const requestOptions = {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.props.user.access}`,
+            },
             body: JSON.stringify({
                 email: this.state.email,
                 slot_date: this.state.date.format("YYYY-MM-DD"),
@@ -97,7 +122,10 @@ export class Booking extends Component {
 
         const requestOptions = {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.props.user.access}`,
+            },
             body: JSON.stringify({
                 slot_date: date.format("YYYY-MM-DD"),
                 experiment_code: code,
@@ -145,8 +173,6 @@ export class Booking extends Component {
     };
 
     render() {
-        console.log(this.state);
-
         if (!this.props.user) {
             return <Navigate to="/login" />;
         }
@@ -181,5 +207,8 @@ export class Booking extends Component {
 }
 
 export default (props) => (
-    <Booking history={useNavigate()} user={localStorage.getItem("user")} />
+    <Booking
+        history={useNavigate()}
+        user={useSelector((state) => state.auth.user)}
+    />
 );

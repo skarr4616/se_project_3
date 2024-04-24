@@ -10,11 +10,14 @@ import {
 } from "react-bootstrap";
 import { Navigate, useNavigate } from "react-router-dom";
 import "./homepage.css";
+import { useSelector, useDispatch } from "react-redux";
+import { getUserInfo, logout, reset } from "../../actions/authSlice";
 
 class Homepage extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            first_name: "",
             experimentData: [],
             displayData: [],
             searchString: "",
@@ -22,27 +25,36 @@ class Homepage extends Component {
     }
 
     componentDidMount() {
-        // const requestOptions = {
-        //     method: "GET",
-        //     headers: { "Content-Type": "application/json" },
-        // };
+        if (!this.props.user) {
+            return <Navigate to="/login" />;
+        }
 
-        // fetch("/api/exp?action=list", requestOptions)
-        //     .then((response) => response.json())
-        //     .then((data) => {
-        //         this.setState({ experimentData: data, displayData: data });
-        //     });
-
-        const config = {
+        const requestOptions = {
+            method: "GET",
             headers: {
-                Authorization: `Bearer ${this.props.user}`,
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.props.user.access}`,
             },
         };
 
-        fetch("/auth/users/me/", config)
+        fetch("/api/exp?action=list", requestOptions)
             .then((response) => response.json())
             .then((data) => {
-                console.log(data);
+                this.setState({ experimentData: data, displayData: data });
+            });
+
+        const config = {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.props.user.access}`,
+            },
+        };
+
+        fetch("/auth/users/me/", requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+                this.setState({ first_name: data.first_name });
             });
     }
 
@@ -55,7 +67,10 @@ class Homepage extends Component {
             case "YQIBZF":
                 const requestOptions = {
                     method: "GET",
-                    headers: { "Content-Type": "application/json" },
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${this.props.user.access}`,
+                    },
                 };
 
                 fetch("/api/exp?exp_code=YQIBZF&action=status", requestOptions)
@@ -99,15 +114,12 @@ class Homepage extends Component {
     };
 
     handleLogout = () => {
-        localStorage.removeItem("access");
-        localStorage.removeItem("refresh");
+        this.props.dispatch(logout());
+        this.props.dispatch(reset());
         this.props.history("/login");
     };
 
     render() {
-        console.log("Rendering homepage");
-        console.log(this.state);
-
         if (!this.props.user) {
             return <Navigate to="/login" />;
         }
@@ -124,7 +136,7 @@ class Homepage extends Component {
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="ml-auto" style={{ fontSize: "18px" }}>
-                            <Nav.Link>{this.state.username}</Nav.Link>
+                            <Nav.Link>{this.state.first_name}</Nav.Link>
                             <Nav.Link onClick={this.handleLogout}>
                                 Logout
                             </Nav.Link>
@@ -192,5 +204,9 @@ class Homepage extends Component {
 }
 
 export default (props) => (
-    <Homepage history={useNavigate()} user={localStorage.getItem("access")} />
+    <Homepage
+        history={useNavigate()}
+        dispatch={useDispatch()}
+        user={useSelector((state) => state.auth.user)}
+    />
 );

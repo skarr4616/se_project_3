@@ -2,12 +2,18 @@ import React, { useEffect } from "react";
 // import { BiUserCheck } from 'react-icons/bi'
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { activate, reset } from "../../actions/authSlice";
+import { activate, reset } from "./../../actions/authSlice";
 import { toast } from "react-toastify";
 // import Spinner from '../components/Spinner'
 
 const Activate = () => {
     const { uid, token } = useParams();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const { isLoading, isError, isSuccess, message } = useSelector(
+        (state) => state.auth
+    );
 
     const handleSubmit = (e) => {
         e.preventDefault();

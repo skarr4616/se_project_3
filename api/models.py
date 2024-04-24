@@ -33,13 +33,6 @@ class Experiments(models.Model):
     experiment_key = models.CharField(max_length=100, null=False)
     experiment_description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    
-class SlotBookings(models.Model):
-    email = models.ForeignKey(User, on_delete=models.CASCADE, to_field='email')
-    experiment_code = models.ForeignKey(Experiments, on_delete=models.CASCADE, to_field='experiment_code')
-    slot_date = models.DateField()
-    slot_time = models.TimeField()
-    created_at = models.DateTimeField(auto_now_add=True)
 
 class UserAccountManager(BaseUserManager):
     def email_validator(self, email):
@@ -127,3 +120,10 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     
     def get_short_name(self):
         return self.first_name
+    
+class SlotBookings(models.Model):
+    email = models.ForeignKey(UserAccount, on_delete=models.CASCADE, to_field='email')
+    experiment_code = models.ForeignKey(Experiments, on_delete=models.CASCADE, to_field='experiment_code')
+    slot_date = models.DateField()
+    slot_time = models.TimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
