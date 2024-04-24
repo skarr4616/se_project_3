@@ -48,13 +48,13 @@ export const loadUser = () => async dispatch => {
         const config = {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `JWT ${localStorage.getItem(access)}`,
+                'Authorization': `JWT ${localStorage.getItem('access')}`,
                 'Accept': 'application/json'
             }
         }
 
         try {
-            const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/user/me/`, body, config);
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/user/me/`, config);
     
             dispatch({
                 type: USER_LOADED,

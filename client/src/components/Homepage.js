@@ -44,7 +44,7 @@ class Homepage extends Component {
     render() {
         return (
             <>
-                <Container>
+                {/* <Container>
                     <Row>
                         <div className="d-flex flex-wrap justify-content-between">
                             {this.cardsData.map((card, index) => (
@@ -74,7 +74,10 @@ class Homepage extends Component {
                             ))}
                         </div>
                     </Row>
-                </Container>
+                </Container> */}
+                <div>
+                    Homepage
+                </div>
             </>
         );
     }
