@@ -1,17 +1,15 @@
 import React, { Component } from "react";
-import {
-    Card,
-    Button,
-    Nav,
-    Row,
-    Navbar,
-    Col,
-    Container,
-} from "react-bootstrap";
+import { Card, Nav, Button, Row, Navbar, Container } from "react-bootstrap";
+import { Navigate, Link } from "react-router-dom";
+import "./homepage.css";
 
 class Homepage extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            username: localStorage.getItem("username"),
+            navigateBook: false,
+        };
     }
 
     cardsData = [
@@ -41,7 +39,23 @@ class Homepage extends Component {
         },
     ];
 
+    handleBookButton = (e) => {
+        this.setState({
+            navigateBook: true,
+        });
+    };
+
     render() {
+        console.log("Rendering homepage");
+
+        if (!this.state.username) {
+            return <Navigate to="/login" />;
+        }
+
+        if (this.state.navigateBook) {
+            return <Navigate to="/book" />;
+        }
+
         return (
             <>
                 <Navbar bg="light" expand="lg">
@@ -56,7 +70,7 @@ class Homepage extends Component {
                         <Navbar.Collapse id="basic-navbar-nav">
                             <Nav className="ml-auto">
                                 <Nav.Link style={{ fontSize: "18px" }}>
-                                    Profile
+                                    {this.state.username}
                                 </Nav.Link>
                                 {/* Add your logout functionality here */}
                             </Nav>
@@ -85,15 +99,20 @@ class Homepage extends Component {
                                         >
                                             Start
                                         </Button>
-                                        <Button variant="secondary">
-                                            Book a Slot
-                                        </Button>
                                     </Card.Body>
                                 </Card>
                             ))}
                         </div>
                     </Row>
                 </Container>
+                <div className="book-button-div">
+                    <Button
+                        className="book-button"
+                        onClick={this.handleBookButton}
+                    >
+                        Book a Slot
+                    </Button>
+                </div>
             </>
         );
     }

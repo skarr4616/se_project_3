@@ -1,0 +1,36 @@
+.time {
+    background-color: #4caf50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 25px;
+}
+
+.time:hover {
+    background-color: blueviolet;
+}
+
+.time:disabled {
+    background-color: grey;
+    color: white;
+}
+
+.selected {
+    background-color: blueviolet;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 25px;
+}
