@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 import { Navbar } from "react-bootstrap";
 
@@ -15,18 +16,20 @@ export class Booking extends Component {
             time: null,
             selectedOption: "Vanishing Rod",
             bookedSlots: [],
-            experimentList: ["Vanishing Rod"],
+            experimentList: [
+                "Vanishing Rod",
+                "Conservation of Mechanical Energy",
+                "Focal Length",
+                "Titration",
+                "Kirchhoff's Voltage Law",
+                "Simple Pendulum",
+            ],
             navigate: false,
         };
     }
 
     componentDidMount() {
-        let code = null;
-        switch (this.state.selectedOption) {
-            case "Vanishing Rod":
-                code = "YQIBZF";
-                break;
-        }
+        const code = this.getExperimentCode(this.state.selectedOption);
 
         const requestOptions = {
             method: "POST",
@@ -47,40 +50,11 @@ export class Booking extends Component {
     }
 
     handleOptionChange = (e) => {
-        this.setState({ selectedOption: e.target.value });
+        this.getBookedSlots(e.target.value, this.state.date);
     };
 
     handleDateChange = (e) => {
-        let code = null;
-        switch (this.state.selectedOption) {
-            case "Vanishing Rod":
-                code = "YQIBZF";
-                break;
-        }
-
-        const requestOptions = {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                slot_date: e.format("YYYY-MM-DD"),
-                experiment_code: code,
-            }),
-        };
-
-        fetch("/api/list", requestOptions)
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
-                const newBookedSlots = data.map((slot) => slot.slot_time);
-                this.setState({
-                    date: e,
-                    time: null,
-                    bookedSlots: newBookedSlots,
-                });
-            })
-            .then(() => {
-                return <Navigate to="/login" />;
-            });
+        this.getBookedSlots(this.state.selectedOption, e);
     };
 
     handleButtonClick = (e) => {
@@ -88,12 +62,7 @@ export class Booking extends Component {
     };
 
     handleBookingConfirmation = () => {
-        let code = null;
-        switch (this.state.selectedOption) {
-            case "Vanishing Rod":
-                code = "YQIBZF";
-                break;
-        }
+        const code = this.getExperimentCode(this.state.selectedOption);
 
         const requestOptions = {
             method: "POST",
@@ -117,18 +86,69 @@ export class Booking extends Component {
                         navigate: true,
                     };
                 });
+            })
+            .then(() => {
+                this.props.history("/");
             });
+    };
+
+    getBookedSlots = (selectedOption, date) => {
+        const code = this.getExperimentCode(selectedOption);
+
+        const requestOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                slot_date: date.format("YYYY-MM-DD"),
+                experiment_code: code,
+            }),
+        };
+
+        fetch("/api/list", requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                const newBookedSlots = data.map((slot) => slot.slot_time);
+                this.setState({
+                    date: date,
+                    selectedOption: selectedOption,
+                    time: null,
+                    bookedSlots: newBookedSlots,
+                });
+            });
+    };
+
+    getExperimentCode = (selectedOption) => {
+        let code = null;
+        switch (selectedOption) {
+            case "Vanishing Rod":
+                code = "YQIBZF";
+                break;
+            case "Conservation of Mechanical Energy":
+                code = "VVDRQD";
+                break;
+            case "Focal Length":
+                code = "VCGMVA";
+                break;
+            case "Titration":
+                code = "IYBLWO";
+                break;
+            case "Kirchhoff's Voltage Law":
+                code = "AKXPQY";
+                break;
+            case "Simple Pendulum":
+                code = "DJCIOO";
+                break;
+        }
+
+        return code;
     };
 
     render() {
         console.log(this.state);
 
-        if (this.state.email === null) {
+        if (!this.props.user) {
             return <Navigate to="/login" />;
-        }
-
-        if (this.state.navigate) {
-            return <Navigate to="/" />;
         }
 
         return (
@@ -160,4 +180,6 @@ export class Booking extends Component {
     }
 }
 
-export default Booking;
+export default (props) => (
+    <Booking history={useNavigate()} user={localStorage.getItem("user")} />
+);

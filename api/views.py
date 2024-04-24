@@ -13,7 +13,7 @@ from .serializers import (
                 SlotDateSerializer, 
                 SlotSerializer, 
                 ExperimentSerializer,
-                AddExperimentSerializer,
+                UserCreateSerializer
 )
 
 # Create your views here.
@@ -99,15 +99,26 @@ class ListBookingView(APIView):
         return Response({'Bad Request': 'Invalid date...'}, status=status.HTTP_400_BAD_REQUEST)
     
 
+class ListUserBookingsView(APIView):
+
+    def get(self, request):
+        
+        email = request.query_params.get('email')
+        queryset = SlotBookings.objects.filter(email=email)
+        return Response(SlotBookingSerializer(queryset, many=True).data, status=status.HTTP_200_OK)
+    
+
 class ExperimentView(APIView):
         
         blynk = Blynk()
     
         def get(self, request):
             
+            print("Hereee")
+
             action = request.query_params.get('action')
 
-            if (action == None):
+            if (action == 'list'):
                 queryset = Experiments.objects.all()
                 return Response(ExperimentSerializer(queryset, many=True).data, status=status.HTTP_200_OK)
             elif (action == 'status'):

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 class Login extends Component {
     constructor(props) {
@@ -29,7 +29,7 @@ class Login extends Component {
             }),
         };
 
-        fetch("/api/login", requestOptions)
+        fetch("/auth/jwt/create/", requestOptions)
             .then((response) => {
                 if (response.status === 200) {
                     console.log("Login successful");
@@ -38,16 +38,13 @@ class Login extends Component {
             })
             .then((data) => {
                 console.log(data);
-                localStorage.setItem("username", data.username);
-                localStorage.setItem("email", data.email);
+                localStorage.setItem("access", data.access);
+                localStorage.setItem("refresh", data.refresh);
+                this.props.history("/");
             });
     };
 
     render() {
-        if (localStorage.getItem("username") !== null) {
-            return <Navigate to="/" />;
-        }
-
         return (
             <div className="login-container">
                 <h1>Log In</h1>
@@ -75,4 +72,4 @@ class Login extends Component {
     }
 }
 
-export default Login;
+export default (props) => <Login history={useNavigate()} />;
