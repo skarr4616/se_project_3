@@ -21,7 +21,6 @@ export class App extends Component {
     render() {
         return (
             <>
-                <p>Reached here</p>
                 <Router>
                     <Nav />
                     <Routes>
@@ -40,8 +39,9 @@ export class App extends Component {
     }
 }
 
-const appDiv = document.getElementById("app");
-render(<App />, appDiv);
+// const appDiv = document.getElementById("app");
+// render(<App />, appDiv);
+export default App;
 
 // export default function App(){
 //     return (
