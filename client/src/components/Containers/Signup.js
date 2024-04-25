@@ -58,9 +58,9 @@ class Signup extends Component {
                 body: JSON.stringify(userData),
             };
 
-            fetch("/auth/users/", requestOptions)
-                .then((response) => response.json())
-                .then((data) => console.log(data));
+            fetch("/auth/users/", requestOptions).then((response) =>
+                response.json()
+            );
         }
     };
 

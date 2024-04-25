@@ -55,7 +55,6 @@ export class Booking extends Component {
         fetch("/api/list", requestOptions)
             .then((response) => response.json())
             .then((data) => {
-                console.log(data);
                 const newBookedSlots = data.map((slot) => slot.slot_time);
                 this.setState({ bookedSlots: newBookedSlots });
             })
@@ -100,7 +99,6 @@ export class Booking extends Component {
         fetch("/api/book", requestOptions)
             .then((response) => response.json())
             .then((data) => {
-                console.log(data);
                 this.setState((prevState) => {
                     return {
                         time: null,
@@ -132,7 +130,6 @@ export class Booking extends Component {
         fetch("/api/list", requestOptions)
             .then((response) => response.json())
             .then((data) => {
-                console.log(data);
                 const newBookedSlots = data.map((slot) => slot.slot_time);
                 this.setState({
                     date: date,

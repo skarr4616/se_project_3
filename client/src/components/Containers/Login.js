@@ -28,7 +28,6 @@ const Login = () => {
     };
 
     const handleSignUp = () => {
-        console.log("Sign Up");
         navigate("/signup");
     };
 

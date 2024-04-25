@@ -141,7 +141,7 @@ class VanishingRod extends Component {
         }
 
         return (
-            <div id='bb'>
+            <div id="bb">
                 <nav role="navigation">
                     <div id="menuToggle">
                         <input type="checkbox" />
@@ -193,7 +193,7 @@ class VanishingRod extends Component {
                         id="btn_plus1"
                     >
                         ▼
-                    </button>   
+                    </button>
                     <button
                         type="button"
                         value="Up"

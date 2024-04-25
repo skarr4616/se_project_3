@@ -145,8 +145,6 @@ class Homepage extends Component {
     };
 
     render() {
-        console.log(this.state);
-
         return (
             <>
                 <Navbar bg="light" expand="lg">
@@ -221,14 +219,18 @@ class Homepage extends Component {
                                             <Card.Text>
                                                 {card.experiment_description}
                                             </Card.Text>
-                                            <Button
-                                                variant="primary"
-                                                className="mr-2"
-                                                value={card.experiment_code}
-                                                onClick={this.handleStartButton}
-                                            >
-                                                Start
-                                            </Button>
+                                            {this.props.user ? (
+                                                <Button
+                                                    variant="primary"
+                                                    className="mr-2"
+                                                    value={card.experiment_code}
+                                                    onClick={
+                                                        this.handleStartButton
+                                                    }
+                                                >
+                                                    Start
+                                                </Button>
+                                            ) : null}
                                         </Card.Body>
                                     </Card>
                                 ))}
@@ -236,14 +238,16 @@ class Homepage extends Component {
                         </Row>
                     </Container>
                 </div>
-                <div className="book-button-div">
-                    <Button
-                        className="book-button"
-                        onClick={this.handleBookButton}
-                    >
-                        Book a Slot
-                    </Button>
-                </div>
+                {this.props.user ? (
+                    <div className="book-button-div">
+                        <Button
+                            className="book-button"
+                            onClick={this.handleBookButton}
+                        >
+                            Book a Slot
+                        </Button>
+                    </div>
+                ) : null}
             </>
         );
     }

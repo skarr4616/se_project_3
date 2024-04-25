@@ -3,6 +3,9 @@ from datetime import datetime, timedelta
 from rest_framework.response import Response
 from rest_framework import status
 from .Blynk import BlynkBuilder
+import logging
+
+logging.basicConfig(filename='logs.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class ExperimentHandlerInterface:
 
@@ -20,26 +23,32 @@ class ExperimentSlotUtil(ExperimentHandlerInterface):
 
     def is_available(self, email, experiment_code):
 
-        print("ExperimentSlotUtil: is_available")
+        logging.info("ExperimentSlotUtil - is_available: Email: " + str(email) + " - Checking slot availability...")
         
         first_check = self.__checkCurrentSlotforUser(email, experiment_code)
         if (first_check == 2):
+            logging.info("ExperimentSlotUtil - is_available: Email: " + str(email) + " - User can perform the experiment...")
             return Response("2", status=status.HTTP_200_OK)
         elif (first_check == 1):
+            logging.info("ExperimentSlotUtil - is_available: Email: " + str(email) + " - User does not has time to perform the experiment...")
             return Response("3", status=status.HTTP_200_OK)
         
-        if (self.__checkCurrentSlot(experiment_code)):
-            if (self.__checkNextSlot(experiment_code)):
+        if (self.__checkCurrentSlot(email, experiment_code)):
+            if (self.__checkNextSlot(email, experiment_code)):
+                logging.info("ExperimentSlotUtil - is_available: Email: " + str(email) + " - User can perform the experiment...")
                 return Response("2", status=status.HTTP_200_OK)
             
+            logging.info("ExperimentSlotUtil - is_available: Email: " + str(email) + " - User cannot perform the experiment...")
             return Response("0", status=status.HTTP_200_OK)
         
+        logging.info("ExperimentSlotUtil - is_available: Email: " + str(email) + " - User cannot perform the experiment...")
         return Response("0", status=status.HTTP_200_OK)
 
     # Check if the current slot belongs to the user
     def __checkCurrentSlotforUser(self, email, experiment_code):
         
-        print("ExperimentSlotUtil: __checkCurrentSlotforUser")
+        logging.info("ExperimentSlotUtil - __checkCurrentSlotforUser: Email: " + str(email) + " - Checking if current slot belongs to user...")
+
         bookings = SlotBookings.objects.filter(
                 email = email,
                 experiment_code = experiment_code, 
@@ -64,9 +73,9 @@ class ExperimentSlotUtil(ExperimentHandlerInterface):
         return 0
     
     # Check if the current slot is available
-    def __checkCurrentSlot(self, experiment_code):
+    def __checkCurrentSlot(self, email, experiment_code):
 
-        print("ExperimentSlotUtil: __checkCurrentSlot")
+        logging.info("ExperimentSlotUtil - __checkCurrentSlot: Email: " + str(email) + " - Checking if current slot is available...")
         bookings = SlotBookings.objects.filter(
                 experiment_code = experiment_code, 
                 slot_date = (self.__current_time.date()).strftime('%Y-%m-%d'),
@@ -87,9 +96,9 @@ class ExperimentSlotUtil(ExperimentHandlerInterface):
         return True
     
     # Check if the next slot is available
-    def __checkNextSlot(self, experiment_code):
+    def __checkNextSlot(self, email, experiment_code):
         
-        print("ExperimentSlotUtil: __checkNextSlot")
+        logging.info("ExperimentSlotUtil - __checkNextSlot: Email: " + str(email) + " - Checking if next slot is available...")
         bookings = SlotBookings.objects.filter(
                 experiment_code = experiment_code, 
                 slot_date = (self.__current_time.date()).strftime('%Y-%m-%d'),
@@ -118,13 +127,15 @@ class ExperimentAvailableUtil(ExperimentHandlerInterface):
     
     def is_available(self, email, experiment_code):
         
-        print("ExperimentAvailableUtil: is_available")
+        logging.info("ExperimentAvailableUtil - is_available: Email: " + str(email) + " - Checking if experiment is available...")
         queryset = Experiments.objects.filter(experiment_code = experiment_code)
 
         Status = queryset[0].experiment_status        
         if (Status == True):
+            logging.info("ExperimentAvailableUtil - is_available: Email: " + str(email) + " - Experiment is not available...")
             return Response("1", status=status.HTTP_200_OK)
         
+        logging.info("ExperimentAvailableUtil - is_available: Email: " + str(email) + " - Experiment is available...")
         return self.__nextUtil.is_available(email, experiment_code)
 
 class ExperimentOnlineUtil(ExperimentHandlerInterface):
@@ -136,7 +147,7 @@ class ExperimentOnlineUtil(ExperimentHandlerInterface):
     
     def is_available(self, email, experiment_code):
         
-        print("ExperimentOnlineUtil: is_available")
+        logging.info("ExperimentOnlineUtil - is_available: Email: " + str(email) + " - Checking if experiment is online...")
         queryset = Experiments.objects.filter(experiment_code = experiment_code)
 
         key = queryset[0].experiment_key
@@ -144,8 +155,10 @@ class ExperimentOnlineUtil(ExperimentHandlerInterface):
 
         if (response.status_code == 200):
             if (not response.json()):
+                logging.info("ExperimentOnlineUtil - is_available: Email: " + str(email) + " - Experiment is online...")
                 return self.__nextUtil.is_available(email, experiment_code)
-        
+
+        logging.info("ExperimentOnlineUtil - is_available: Email: " + str(email) + " - Experiment is not online...")       
         return Response("0", status=status.HTTP_200_OK)
         
 
@@ -157,12 +170,14 @@ class ExperimentExistsUtil(ExperimentHandlerInterface):
     
     def is_available(self, email, experiment_code):
         
-        print("ExperimentExistsUtil: is_available")
+        logging.info("ExperimentExistsUtil - is_available: Email: " + str(email) + " - Checking if experiment exists...")
         queryset = Experiments.objects.filter(experiment_code = experiment_code)
         
         if (queryset.exists() == False):
+            logging.error("ExperimentExistsUtil - is_available: Email: " + str(email) + " - Invalid experiment code...")
             return Response({'Bad Request': 'Invalid experiment code...'}, status=status.HTTP_400_BAD_REQUEST)
         
+        logging.info("ExperimentExistsUtil - is_available: Email: " + str(email) + " - Experiment exists...")
         return self.__nextUtil.is_available(email, experiment_code)
 
 class ExperimentHandler:
@@ -173,6 +188,6 @@ class ExperimentHandler:
         self.__util = ExperimentExistsUtil()
     
     def isExperimentPossible(self):
-        
-        print("ExperimentHandler: isExperimentPossible")
+
+        logging.info("ExperimentHandler - isExperimentPossible: Email: " + str(self.__email) + "Experiment Code: " + str(self.__experiment_code) +  " - Checking if experiment is possible...")        
         return self.__util.is_available(self.__email, self.__experiment_code)

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+import { logout, reset } from "../actions/authSlice";
 
 import { Navbar, Nav } from "react-bootstrap";
 
@@ -8,30 +9,31 @@ export class ListBooking extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            // email: localStorage.getItem("email"),
             bookings: [],
         };
     }
 
     componentDidMount() {
-        console.log("componentDidMount");
-        console.log(this.props.user);
         const requestOptions = {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${this.props.user.access}`,
             },
-
         };
 
         fetch("/api/user", requestOptions)
             .then((response) => response.json())
             .then((data) => {
-                console.log(data);
                 this.setState({ bookings: data });
             });
     }
+
+    handleLogout = () => {
+        this.props.dispatch(logout());
+        this.props.dispatch(reset());
+        this.props.history("/");
+    };
 
     render() {
         return (
@@ -60,8 +62,8 @@ export class ListBooking extends Component {
                     <ul>
                         {this.state.bookings.map((booking) => (
                             <li key={booking.booking_id}>
-                                {booking.experiment_code} -{" "}
-                                {booking.slot_date} - {booking.slot_time}
+                                {booking.experiment_name} - {booking.slot_date}{" "}
+                                - {booking.slot_time}
                             </li>
                         ))}
                     </ul>
@@ -70,7 +72,6 @@ export class ListBooking extends Component {
         );
     }
 }
-
 
 export default (props) => (
     <ListBooking
