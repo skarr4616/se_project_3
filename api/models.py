@@ -17,15 +17,6 @@ def generate_unique_code():
 
     return code
 
-
-# Create your models here.
-class User(models.Model):
-    username = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=100)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
 class Experiments(models.Model):
     experiment_code = models.CharField(max_length=8, unique=True, default=generate_unique_code)
     experiment_name = models.CharField(max_length=100, null=False)
@@ -101,7 +92,7 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
 
-    date_joined = models.DateTimeField(default=timezone.now)
+    date_joined = models.DateTimeField(auto_now=True)
 
     objects = UserAccountManager()
 

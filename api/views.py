@@ -1,65 +1,22 @@
 from django.shortcuts import render
-from rest_framework import generics
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+import os
 
+from datetime import datetime, timedelta
 from .Blynk import Blynk
-from .models import User, Experiments, SlotBookings
+from .models import Experiments, SlotBookings
 from .serializers import (
-                UserSerializer, 
-                AddUserSerializer, 
                 SlotBookingSerializer, 
                 SlotDateSerializer, 
                 SlotSerializer, 
                 ExperimentSerializer,
-                UserCreateSerializer
 )
 
-# Create your views here.
-class UserView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+from .utils import ExperimentHandler
 
-
-class AddUserView(APIView):
-
-    serializer_class = AddUserSerializer
-
-    def post(self, request):
-        
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            username = serializer.validated_data.get('username')
-            email = serializer.validated_data.get('email')
-            password = serializer.validated_data.get('password')   
-            
-            queryset = User.objects.filter(email=email)
-            if queryset.exists():
-                return Response({'Bad Request': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                user = User(username=username, email=email, password=password)
-                user.save()
-                return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
-        
-        return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
-    
-
-class LoginUserView(APIView):
-    
-
-    def post(self, request):
-
-        email = request.data.get('email')
-        password = request.data.get('password')
-        
-        queryset = User.objects.filter(email=email, password=password)
-        if queryset.exists():
-            return Response(UserSerializer(queryset[0]).data, status=status.HTTP_200_OK)
-        
-        return Response({'Bad Request': 'Invalid credentials...'}, status=status.HTTP_400_BAD_REQUEST)
-    
-
+# view to book a slot
 class BookSlotView(APIView):
     
     serializer_class = SlotBookingSerializer
@@ -80,7 +37,9 @@ class BookSlotView(APIView):
         print(serializer.errors)
         
         return Response({'Bad Request': 'Invalid...'}, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
+# view to list all bookings of a particular date and experiment    
 class ListBookingView(APIView):
     
     serializer_class = SlotDateSerializer
@@ -99,6 +58,8 @@ class ListBookingView(APIView):
         return Response({'Bad Request': 'Invalid date...'}, status=status.HTTP_400_BAD_REQUEST)
     
 
+
+# view to list all bookings of a particular user
 class ListUserBookingsView(APIView):
 
     def get(self, request):
@@ -108,21 +69,28 @@ class ListUserBookingsView(APIView):
         return Response(SlotBookingSerializer(queryset, many=True).data, status=status.HTTP_200_OK)
     
 
+
+# view to list all experiments and their details
 class ExperimentView(APIView):
         
         blynk = Blynk()
     
         def get(self, request):
             
-            print("Hereee")
-
             action = request.query_params.get('action')
 
             if (action == 'list'):
                 queryset = Experiments.objects.all()
                 return Response(ExperimentSerializer(queryset, many=True).data, status=status.HTTP_200_OK)
             elif (action == 'status'):
+
+                email = request.user
                 exp_code = request.GET.get('exp_code')
+
+                handler = ExperimentHandler(exp_code, email)
+                if (handler.is_user_eligible() == False):
+                    return Response("0", status=status.HTTP_200_OK) 
+
                 queryset = Experiments.objects.filter(experiment_code=exp_code)
 
                 if(queryset.exists() == False):

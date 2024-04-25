@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
     Card,
@@ -14,23 +14,30 @@ import {
 class VanishingRod extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            rod_state: "up",
-        };
     }
 
-    qpiRequest(e) {
+    componentDidMount() {
+        if (!this.props.user) {
+            return <Navigate to="/login" />;
+        }
+
         const requestOptions = {
-            method: "PUT",
+            method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${this.props.user.access}`,
             },
-            body: JSON.stringify({ exp_id: 1, action: "v3", value: "0" }),
         };
-        fetch("/api/exp", requestOptions)
+
+        fetch("/api/exp?exp_code=YQIBZF&action=status", requestOptions)
             .then((response) => response.json())
-            .then((data) => console.log(data));
+            .then((data) => {
+                if (data == "1") {
+                } else {
+                    alert("Experiment is Offline");
+                    this.props.history("/");
+                }
+            });
     }
 
     handleControlClick = (e) => {
@@ -73,6 +80,10 @@ class VanishingRod extends Component {
     };
 
     render() {
+        if (!this.props.user) {
+            return <Navigate to="/login" />;
+        }
+
         return (
             <>
                 <div class="container d-flex justify-content-center align-items-center mh-100 bg-sucess">

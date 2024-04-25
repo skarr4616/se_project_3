@@ -65,24 +65,7 @@ class Homepage extends Component {
     handleStartButton = (e) => {
         switch (e.target.value) {
             case "YQIBZF":
-                const requestOptions = {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${this.props.user.access}`,
-                    },
-                };
-
-                fetch("/api/exp?exp_code=YQIBZF&action=status", requestOptions)
-                    .then((response) => response.json())
-                    .then((data) => {
-                        if (data == "1") {
-                            console.log("Entering Experiment");
-                            this.props.history("/experiment/1");
-                        } else {
-                            alert("Experiment is Offline");
-                        }
-                    });
+                this.props.history("/experiment/1");
                 break;
         }
     };

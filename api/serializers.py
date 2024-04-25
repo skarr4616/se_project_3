@@ -1,12 +1,7 @@
 from rest_framework import serializers
-from .models import User, Experiments, SlotBookings
+from .models import Experiments, SlotBookings
 from djoser.serializers import UserCreateSerializer, UserSerializer as DjoserUserSerializer
 from django.contrib.auth import get_user_model
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'email', 'password')
 
 class SlotSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,11 +12,6 @@ class ExperimentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Experiments
         fields = ('experiment_code', 'experiment_name','experiment_description')
-
-class AddUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'password')
 
 class SlotBookingSerializer(serializers.ModelSerializer):
     class Meta:
