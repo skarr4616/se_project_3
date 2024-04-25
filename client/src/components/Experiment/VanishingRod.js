@@ -28,7 +28,7 @@ class VanishingRod extends Component {
 
         let start_time = localStorage.getItem("timer");
         let deadline = new Date(start_time);
-        deadline.setSeconds(deadline.getSeconds() + 10);
+        deadline.setSeconds(deadline.getSeconds() + 120);
         this.clearTimer(deadline);
     }
 

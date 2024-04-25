@@ -100,6 +100,7 @@ class ListUserBookingsView(APIView):
 # view to list all experiments and their details
 class ExperimentView(APIView):
         
+        blynk = BlynkBuilder()
         permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     
         def get(self, request):
