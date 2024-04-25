@@ -1,0 +1,15 @@
+.book-button-div {
+    color: #000;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    text-align: center;
+}
+
+.book-button {
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    text-align: center;
+}

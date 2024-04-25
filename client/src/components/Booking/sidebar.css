@@ -1,0 +1,20 @@
+.sidebar {
+    height: 100%;
+    width: 350px;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    background-color: #fffdd0;
+    padding-top: 20px;
+}
+
+select {
+    width: 75%;
+    padding: 10px;
+    margin: 5px 0;
+    margin-left: 40px;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    border-radius: 25px;
+}
