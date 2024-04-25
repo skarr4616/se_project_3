@@ -1,22 +1,31 @@
 import React, { Component } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+
 import { Navbar, Nav } from "react-bootstrap";
 
 export class ListBooking extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            email: localStorage.getItem("email"),
+            // email: localStorage.getItem("email"),
             bookings: [],
         };
     }
 
     componentDidMount() {
+        console.log("componentDidMount");
+        console.log(this.props.user);
         const requestOptions = {
             method: "GET",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.props.user.access}`,
+            },
+
         };
 
-        fetch("/api/user?email=" + this.state.email, requestOptions)
+        fetch("/api/user", requestOptions)
             .then((response) => response.json())
             .then((data) => {
                 console.log(data);
@@ -52,7 +61,7 @@ export class ListBooking extends Component {
                         {this.state.bookings.map((booking) => (
                             <li key={booking.booking_id}>
                                 {booking.experiment_code} -{" "}
-                                {booking.booking_date}
+                                {booking.slot_date} - {booking.slot_time}
                             </li>
                         ))}
                     </ul>
@@ -62,4 +71,11 @@ export class ListBooking extends Component {
     }
 }
 
-export default ListBooking;
+
+export default (props) => (
+    <ListBooking
+        history={useNavigate()}
+        dispatch={useDispatch()}
+        user={useSelector((state) => state.auth.user)}
+    />
+);

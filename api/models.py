@@ -1,11 +1,14 @@
-from django.utils import timezone
-from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
-from django.core.validators import validate_email
-import string
 import random
+import string
+
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
+                                        PermissionsMixin)
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
+from django.db import models
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+
 
 def generate_unique_code():
     length = 6
@@ -19,7 +22,7 @@ def generate_unique_code():
 
 class Experiments(models.Model):
     experiment_code = models.CharField(max_length=8, unique=True, default=generate_unique_code)
-    experiment_name = models.CharField(max_length=100, null=False)
+    experiment_name = models.CharField(max_length=100, unique=True, null=False)
     experiment_status = models.BooleanField(default=False, null=False)
     experiment_key = models.CharField(max_length=100, null=False)
     experiment_description = models.TextField()

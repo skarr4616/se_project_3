@@ -1,6 +1,6 @@
 import requests
 
-class Blynk:
+class BlynkBuilder:
     def __init__(self):
         self.url = "https://blynk.cloud/external/api/"
 

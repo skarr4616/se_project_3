@@ -5,7 +5,7 @@ from rest_framework.response import Response
 import os
 
 from datetime import datetime, timedelta
-from .Blynk import Blynk
+from .Blynk import BlynkBuilder
 from .models import Experiments, SlotBookings
 from .serializers import (
                 SlotBookingSerializer, 
@@ -64,7 +64,8 @@ class ListUserBookingsView(APIView):
 
     def get(self, request):
         
-        email = request.query_params.get('email')
+        email = request.user
+        print(email)
         queryset = SlotBookings.objects.filter(email=email)
         return Response(SlotBookingSerializer(queryset, many=True).data, status=status.HTTP_200_OK)
     
@@ -73,7 +74,7 @@ class ListUserBookingsView(APIView):
 # view to list all experiments and their details
 class ExperimentView(APIView):
         
-        blynk = Blynk()
+        blynk = BlynkBuilder()
     
         def get(self, request):
             
