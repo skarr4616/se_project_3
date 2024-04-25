@@ -110,7 +110,6 @@ class Homepage extends Component {
                             this.props.history("/");
                         }
                     });
-                this.props.history("/experiment/1");
                 break;
         }
     };

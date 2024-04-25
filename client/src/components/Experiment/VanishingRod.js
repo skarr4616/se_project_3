@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import "./vanish.css";
 import {
     Card,
     Button,
@@ -22,17 +23,12 @@ class VanishingRod extends Component {
 
     componentDidMount() {
         if (!this.props.user) {
-            console.log("User");
             return <Navigate to="/login" />;
         }
 
         let start_time = localStorage.getItem("timer");
         let deadline = new Date(start_time);
-        console.log("Start time");
-        console.log(deadline);
         deadline.setSeconds(deadline.getSeconds() + 10);
-        console.log("Deadline");
-        console.log(deadline);
         this.clearTimer(deadline);
     }
 
@@ -51,8 +47,6 @@ class VanishingRod extends Component {
 
     startTimer = (e) => {
         const { total, hours, minutes, seconds } = this.getRemainingTime(e);
-        console.log("heree");
-        console.log(total);
         if (total >= 0) {
             this.setState({
                 timer:
@@ -64,15 +58,13 @@ class VanishingRod extends Component {
             });
         } else {
             clearInterval(this.Ref.current);
-            // this.handleExit();
+            this.handleExit();
         }
     };
 
     clearTimer = (deadline) => {
         this.setState({ timer: "00:00:00" });
 
-        console.log("in clear timer");
-        console.log("");
         const id = setInterval(() => {
             this.startTimer(deadline);
         }, 1000);
@@ -149,7 +141,7 @@ class VanishingRod extends Component {
         }
 
         return (
-            <>
+            <div id='bb'>
                 <nav role="navigation">
                     <div id="menuToggle">
                         <input type="checkbox" />
@@ -176,7 +168,7 @@ class VanishingRod extends Component {
                     <label id="inst">Instructions</label>
                 </nav>
                 <div class="range1">
-                    <nav class="navbar">
+                    <nav class="navbar" id="navs">
                         <a id="focal_head" href="#focal">
                             Vanishing Rod
                         </a>
@@ -201,7 +193,7 @@ class VanishingRod extends Component {
                         id="btn_plus1"
                     >
                         ▼
-                    </button>
+                    </button>   
                     <button
                         type="button"
                         value="Up"
@@ -224,7 +216,7 @@ class VanishingRod extends Component {
                         ></iframe>
                     </div>
                 </div>
-            </>
+            </div>
         );
     }
 }
