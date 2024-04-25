@@ -20,9 +20,6 @@ export class Booking extends Component {
                 "Vanishing Rod",
                 "Conservation of Mechanical Energy",
                 "Focal Length",
-                "Titration",
-                "Kirchhoff's Voltage Law",
-                "Simple Pendulum",
             ],
             navigate: false,
         };
@@ -157,15 +154,6 @@ export class Booking extends Component {
                 break;
             case "Focal Length":
                 code = "VCGMVA";
-                break;
-            case "Titration":
-                code = "IYBLWO";
-                break;
-            case "Kirchhoff's Voltage Law":
-                code = "AKXPQY";
-                break;
-            case "Simple Pendulum":
-                code = "DJCIOO";
                 break;
         }
 

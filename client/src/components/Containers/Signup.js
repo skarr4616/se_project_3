@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import "./LoginSignup.css";
+import { useNavigate } from "react-router-dom";
 
 class Signup extends Component {
     constructor(props) {
@@ -32,6 +34,10 @@ class Signup extends Component {
         this.setState({ re_password: e.target.value });
     };
 
+    handleLogin = () => {
+        this.props.history("/login");
+    };
+
     handleSubmit = (e) => {
         e.preventDefault();
 
@@ -60,54 +66,65 @@ class Signup extends Component {
 
     render() {
         return (
-            <div className="signup-container">
-                <h1>Sign Up</h1>
-                <form onSubmit={this.handleSubmit}>
-                    <label htmlFor="First Name">First Name:</label>
-                    <input
-                        type="text"
-                        id="first_name"
-                        value={this.state.first_name}
-                        onChange={this.handleFirstNameChange}
-                        required
-                    />
-                    <label htmlFor="Last Name">Last Name:</label>
-                    <input
-                        type="text"
-                        id="last_name"
-                        value={this.state.last_name}
-                        onChange={this.handleLastNameChange}
-                        required
-                    />
-                    <label htmlFor="email">Email:</label>
-                    <input
-                        type="email"
-                        id="email"
-                        value={this.state.email}
-                        onChange={this.handleEmailChange}
-                        required
-                    />
-                    <label htmlFor="password">Password:</label>
-                    <input
-                        type="password"
-                        id="password"
-                        value={this.state.password}
-                        onChange={this.handlePasswordChange}
-                        required
-                    />
-                    <label htmlFor="password">Retype Password:</label>
-                    <input
-                        type="password"
-                        id="re_password"
-                        value={this.state.re_password}
-                        onChange={this.handleRePasswordChange}
-                        required
-                    />
-                    <button type="submit">Sign Up</button>
-                </form>
+            <div className="login-signup-container">
+                <div className="header">
+                    <div className="text">Sign Up</div>
+                    <div className="underline"></div>
+                </div>
+                <div className="inputs">
+                    <div className="input">
+                        <input
+                            type="text"
+                            placeholder="First Name"
+                            value={this.state.first_name}
+                            onChange={this.handleFirstNameChange}
+                        />
+                    </div>
+                    <div className="input">
+                        <input
+                            type="text"
+                            placeholder="Last Name"
+                            value={this.state.last_name}
+                            onChange={this.handleLastNameChange}
+                        />
+                    </div>
+                    <div className="input">
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            value={this.state.email}
+                            onChange={this.handleEmailChange}
+                        />
+                    </div>
+                    <div className="input">
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={this.state.password}
+                            onChange={this.handlePasswordChange}
+                        />
+                    </div>
+                    <div className="input">
+                        <input
+                            type="password"
+                            placeholder="Confirm Password"
+                            value={this.state.re_password}
+                            onChange={this.handleRePasswordChange}
+                        />
+                    </div>
+                </div>
+                <div className="login">
+                    Already have an account?{" "}
+                    <span onClick={this.handleLogin}>Log In</span>
+                </div>
+                <div className="submit-container">
+                    <div className="submit" onClick={this.handleSubmit}>
+                        Register
+                    </div>
+                </div>
             </div>
         );
     }
 }
 
-export default Signup;
+export default (props) => <Signup history={useNavigate()} />;

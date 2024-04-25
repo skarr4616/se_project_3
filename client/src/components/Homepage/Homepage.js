@@ -11,7 +11,7 @@ import {
 import { Navigate, useNavigate } from "react-router-dom";
 import "./homepage.css";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserInfo, logout, reset } from "../../actions/authSlice";
+import { logout, reset } from "../../actions/authSlice";
 
 class Homepage extends Component {
     constructor(props) {
@@ -25,15 +25,10 @@ class Homepage extends Component {
     }
 
     componentDidMount() {
-        if (!this.props.user) {
-            return <Navigate to="/login" />;
-        }
-
         const requestOptions = {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${this.props.user.access}`,
             },
         };
 
@@ -43,19 +38,20 @@ class Homepage extends Component {
                 this.setState({ experimentData: data, displayData: data });
             });
 
-        const config = {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${this.props.user.access}`,
-            },
-        };
-
-        fetch("/auth/users/me/", requestOptions)
-            .then((response) => response.json())
-            .then((data) => {
-                this.setState({ first_name: data.first_name });
-            });
+        if (this.props.user) {
+            const config = {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${this.props.user.access}`,
+                },
+            };
+            fetch("/auth/users/me/", config)
+                .then((response) => response.json())
+                .then((data) => {
+                    this.setState({ first_name: data.first_name });
+                });
+        }
     }
 
     handleBookButton = (e) => {
@@ -105,6 +101,9 @@ class Homepage extends Component {
                         } else if (data == "1") {
                             alert("Experiment is already in use");
                             this.props.history("/");
+                        } else if (data == "3") {
+                            alert("Your slot has expired");
+                            this.props.history("/");
                         } else {
                             alert("Experiment is not available");
                             this.props.history("/");
@@ -143,13 +142,10 @@ class Homepage extends Component {
     handleLogout = () => {
         this.props.dispatch(logout());
         this.props.dispatch(reset());
-        this.props.history("/login");
     };
 
     render() {
-        if (!this.props.user) {
-            return <Navigate to="/login" />;
-        }
+        console.log(this.state);
 
         return (
             <>
@@ -163,25 +159,48 @@ class Homepage extends Component {
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="ml-auto" style={{ fontSize: "18px" }}>
-                            <Nav.Link>{this.state.first_name}</Nav.Link>
-                            <Nav.Link onClick={this.handleLogout}>
-                                Logout
-                            </Nav.Link>
-                            <Nav.Link onClick={this.listUserBookings}>
-                                My Bookings
-                            </Nav.Link>
+                            {this.props.user ? (
+                                <>
+                                    <Nav.Link>{this.state.first_name}</Nav.Link>
+                                    <Nav.Link onClick={this.listUserBookings}>
+                                        Bookings
+                                    </Nav.Link>
+                                    <Nav.Link onClick={this.handleLogout}>
+                                        Logout
+                                    </Nav.Link>
+                                </>
+                            ) : (
+                                <>
+                                    <Nav.Link
+                                        onClick={() =>
+                                            this.props.history("/login")
+                                        }
+                                    >
+                                        Login
+                                    </Nav.Link>
+                                    <Nav.Link
+                                        onClick={() =>
+                                            this.props.history("/signup")
+                                        }
+                                    >
+                                        Register
+                                    </Nav.Link>
+                                </>
+                            )}
                         </Nav>
                     </Navbar.Collapse>
-                    <Form className="d-flex">
-                        <Form.Control
-                            type="search"
-                            placeholder="Search"
-                            className="me-2"
-                            aria-label="Search"
-                            value={this.state.searchString}
-                            onChange={this.handleSearchChange}
-                        />
-                    </Form>
+                    {this.props.user ? (
+                        <Form className="d-flex">
+                            <Form.Control
+                                type="search"
+                                placeholder="Search"
+                                className="me-2"
+                                aria-label="Search"
+                                value={this.state.searchString}
+                                onChange={this.handleSearchChange}
+                            />
+                        </Form>
+                    ) : null}
                 </Navbar>
                 <div>
                     <Container>

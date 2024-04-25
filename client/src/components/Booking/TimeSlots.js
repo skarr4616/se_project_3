@@ -4,6 +4,18 @@ import "./timeslots.css";
 import Time from "./Time";
 
 export class TimeSlots extends Component {
+    checkTime = (time) => {
+        const currentTime = new Date();
+        const currentTimeString = `${currentTime
+            .getHours()
+            .toString()
+            .padStart(2, "0")}:${currentTime
+            .getMinutes()
+            .toString()
+            .padStart(2, "0")}`;
+        return currentTimeString > time;
+    };
+
     generateGrid = () => {
         const grid = [];
         for (let hour = 0; hour < 24; hour++) {
@@ -16,9 +28,10 @@ export class TimeSlots extends Component {
                         key={`${hour}-${minute}`}
                         date={this.props.date}
                         time={time}
-                        isDisabled={this.props.bookedSlots.includes(
-                            time + ":00"
-                        )}
+                        isDisabled={
+                            this.props.bookedSlots.includes(time + ":00") ||
+                            this.checkTime(time)
+                        }
                         handleButtonClick={this.props.handleButtonClick}
                         selectedTime={this.props.selectedTime}
                     />

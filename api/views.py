@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-import os
+from rest_framework import permissions
 
 from datetime import datetime, timedelta
 from .Blynk import BlynkBuilder
@@ -74,7 +74,7 @@ class ListUserBookingsView(APIView):
 # view to list all experiments and their details
 class ExperimentView(APIView):
         
-        blynk = BlynkBuilder()
+        permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     
         def get(self, request):
             
@@ -88,28 +88,11 @@ class ExperimentView(APIView):
                 email = request.user
                 exp_code = request.GET.get('exp_code')
 
-                # handler = ExperimentHandler(exp_code, email)
-                # if (handler.is_user_eligible() == False):
-                #     return Response("0", status=status.HTTP_200_OK)
+                handler = ExperimentHandler(email, exp_code)
+                return handler.isExperimentPossible()
+            
+            return Response({'Bad Request': 'Invalid action...'}, status=status.HTTP_400_BAD_REQUEST)
 
-
-                queryset = Experiments.objects.filter(experiment_code=exp_code)
-
-                if(queryset.exists() == False):
-                    return Response("Incorrect Experiment ID", status=status.HTTP_400_BAD_REQUEST)
-                else:
-                    key = queryset[0].experiment_key
-                    Status  = queryset[0].experiment_status
-                    response = self.blynk.hardwareStatus(key)
-                    if(response.status_code == 200):
-                        if(not response.json()):
-                            if(Status == False):
-                                return Response("2", status=status.HTTP_200_OK)
-                            else:
-                                print("I am here")
-                                return Response("1", status=status.HTTP_200_OK)
-
-                    return Response("0", status=status.HTTP_200_OK) 
         
         def put(self,request):
             
