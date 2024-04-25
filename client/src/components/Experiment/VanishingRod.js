@@ -14,31 +14,71 @@ import {
 class VanishingRod extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            timer: "00:00:00",
+        };
+        this.Ref = React.createRef();
     }
 
     componentDidMount() {
         if (!this.props.user) {
+            console.log("User");
             return <Navigate to="/login" />;
         }
 
-        const requestOptions = {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${this.props.user.access}`,
-            },
-        };
-
-        fetch("/api/exp?exp_code=YQIBZF&action=status", requestOptions)
-            .then((response) => response.json())
-            .then((data) => {
-                if (data == "1") {
-                } else {
-                    alert("Experiment is Offline");
-                    this.props.history("/");
-                }
-            });
+        let start_time = localStorage.getItem("timer");
+        let deadline = new Date(start_time);
+        console.log("Start time");
+        console.log(deadline);
+        deadline.setSeconds(deadline.getSeconds() + 10);
+        console.log("Deadline");
+        console.log(deadline);
+        this.clearTimer(deadline);
     }
+
+    getRemainingTime = (e) => {
+        const total = Date.parse(e) - Date.parse(new Date());
+        const seconds = Math.floor((total / 1000) % 60);
+        const minutes = Math.floor((total / 1000 / 60) % 60);
+        const hours = Math.floor((total / 1000 / 60 / 60) % 24);
+        return {
+            total,
+            hours,
+            minutes,
+            seconds,
+        };
+    };
+
+    startTimer = (e) => {
+        const { total, hours, minutes, seconds } = this.getRemainingTime(e);
+        console.log("heree");
+        console.log(total);
+        if (total >= 0) {
+            this.setState({
+                timer:
+                    (hours > 9 ? hours : "0" + hours) +
+                    ":" +
+                    (minutes > 9 ? minutes : "0" + minutes) +
+                    ":" +
+                    (seconds > 9 ? seconds : "0" + seconds),
+            });
+        } else {
+            clearInterval(this.Ref.current);
+            // this.handleExit();
+        }
+    };
+
+    clearTimer = (deadline) => {
+        this.setState({ timer: "00:00:00" });
+
+        console.log("in clear timer");
+        console.log("");
+        const id = setInterval(() => {
+            this.startTimer(deadline);
+        }, 1000);
+
+        this.Ref.current = id;
+    };
 
     handleControlClick = (e) => {
         if (e.target.value === "Up") {
@@ -52,6 +92,7 @@ class VanishingRod extends Component {
                     exp_id: "YQIBZF",
                     action: "v3",
                     value: "0",
+                    method: "blynk",
                 }),
             };
             fetch("/api/exp", resuestOptions)
@@ -68,15 +109,38 @@ class VanishingRod extends Component {
                     exp_id: "YQIBZF",
                     action: "v3",
                     value: "1",
+                    method: "blynk",
                 }),
             };
             fetch("/api/exp", resuestOptions)
                 .then((response) => response.json())
                 .then((data) => console.log(data));
-        } else if (e.target.value === "Exit") {
-            console.log("Exiting experiment");
-            this.props.history("/");
+        } else {
+            console.log("Invalid Input");
         }
+    };
+
+    handleExit = () => {
+        console.log("Exiting experiment");
+        const resuestOptions = {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.props.user.access}`,
+            },
+            body: JSON.stringify({
+                exp_id: "YQIBZF",
+                action: "status",
+                value: "exit",
+                method: "status",
+            }),
+        };
+
+        fetch("/api/exp", resuestOptions)
+            .then((response) => response.json())
+            .then((data) => console.log(data));
+
+        this.props.history("/");
     };
 
     render() {
@@ -86,15 +150,71 @@ class VanishingRod extends Component {
 
         return (
             <>
-                <div class="container d-flex justify-content-center align-items-center mh-100 bg-sucess">
-                    <div class="mw-100 p-3">
-                        <p>Vanishing Rod Experiment</p>
+                <nav role="navigation">
+                    <div id="menuToggle">
+                        <input type="checkbox" />
+
+                        <span></span>
+                        <span></span>
+                        <span></span>
+
+                        <ul id="menu">
+                            <div class="up_half">
+                                <h2>How to use this dashboard</h2>
+                            </div>
+
+                            <li>
+                                Use the Up and Down arrows in the control widget
+                                to control the position of the glass rods. You
+                                can do this multiple times to see the rod
+                                vanishing in the left beaker containing
+                                sunflower oil while it remains clearly visible
+                                in the right beaker containing water.
+                            </li>
+                        </ul>
+                    </div>
+                    <label id="inst">Instructions</label>
+                </nav>
+                <div class="range1">
+                    <nav class="navbar">
+                        <a id="focal_head" href="#focal">
+                            Vanishing Rod
+                        </a>
+                        <a id="session" type="button" onClick={this.handleExit}>
+                            Leave Session
+                        </a>
+                        <a id="demo">{this.state.timer}</a>
+                    </nav>
+                    <div class="slidervalue1">
+                        <span id="us">0</span>
                     </div>
 
-                    <div class="mw-100 p-3">
+                    <div class="field1">
+                        <div class="value left">Up</div>
+                        <div class="value right">Down</div>
+                    </div>
+                    <button
+                        type="button"
+                        value="Down"
+                        onClick={this.handleControlClick}
+                        class="btn_plus"
+                        id="btn_plus1"
+                    >
+                        ▼
+                    </button>
+                    <button
+                        type="button"
+                        value="Up"
+                        onClick={this.handleControlClick}
+                        class="btn_minus"
+                        id="btn_minus1"
+                    >
+                        ▲
+                    </button>
+                    <div class="stream">
                         <iframe
-                            width="560"
-                            height="315"
+                            width="640"
+                            height="360"
                             src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=SiXViXzuqsNumNzw&autoplay=1"
                             title="YouTube video player"
                             frameborder="0"
@@ -102,19 +222,6 @@ class VanishingRod extends Component {
                             referrerpolicy="strict-origin-when-cross-origin"
                             allowfullscreen
                         ></iframe>
-                    </div>
-                    <div class="mw-100 p-3">
-                        <Button value="Up" onClick={this.handleControlClick}>
-                            Up
-                        </Button>
-                        <Button value="Down" onClick={this.handleControlClick}>
-                            Down
-                        </Button>
-                    </div>
-                    <div class="mw-100 p-3">
-                        <Button value="Exit" onClick={this.handleControlClick}>
-                            Exit
-                        </Button>
                     </div>
                 </div>
             </>

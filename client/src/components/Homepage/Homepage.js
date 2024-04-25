@@ -65,6 +65,51 @@ class Homepage extends Component {
     handleStartButton = (e) => {
         switch (e.target.value) {
             case "YQIBZF":
+                const requestOptions = {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${this.props.user.access}`,
+                    },
+                };
+
+                fetch("/api/exp?exp_code=YQIBZF&action=status", requestOptions)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data == "2") {
+                            console.log("Entering Experiment");
+                            const resuestOptions = {
+                                method: "PUT",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: `Bearer ${this.props.user.access}`,
+                                },
+                                body: JSON.stringify({
+                                    exp_id: "YQIBZF",
+                                    action: "status",
+                                    value: "enter",
+                                    method: "status",
+                                }),
+                            };
+
+                            fetch("/api/exp", resuestOptions)
+                                .then((response) => response.json())
+                                .then((data) => console.log(data));
+
+                            let start_time = new Date();
+                            localStorage.setItem(
+                                "timer",
+                                start_time.toString()
+                            );
+                            this.props.history("/experiment/1");
+                        } else if (data == "1") {
+                            alert("Experiment is already in use");
+                            this.props.history("/");
+                        } else {
+                            alert("Experiment is not available");
+                            this.props.history("/");
+                        }
+                    });
                 this.props.history("/experiment/1");
                 break;
         }

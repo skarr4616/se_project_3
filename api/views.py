@@ -87,9 +87,10 @@ class ExperimentView(APIView):
                 email = request.user
                 exp_code = request.GET.get('exp_code')
 
-                handler = ExperimentHandler(exp_code, email)
-                if (handler.is_user_eligible() == False):
-                    return Response("0", status=status.HTTP_200_OK) 
+                # handler = ExperimentHandler(exp_code, email)
+                # if (handler.is_user_eligible() == False):
+                #     return Response("0", status=status.HTTP_200_OK)
+
 
                 queryset = Experiments.objects.filter(experiment_code=exp_code)
 
@@ -97,10 +98,15 @@ class ExperimentView(APIView):
                     return Response("Incorrect Experiment ID", status=status.HTTP_400_BAD_REQUEST)
                 else:
                     key = queryset[0].experiment_key
+                    Status  = queryset[0].experiment_status
                     response = self.blynk.hardwareStatus(key)
                     if(response.status_code == 200):
                         if(not response.json()):
-                            return Response("1", status=status.HTTP_200_OK) 
+                            if(Status == False):
+                                return Response("2", status=status.HTTP_200_OK)
+                            else:
+                                print("I am here")
+                                return Response("1", status=status.HTTP_200_OK)
 
                     return Response("0", status=status.HTTP_200_OK) 
         
@@ -109,11 +115,23 @@ class ExperimentView(APIView):
             exp_code = request.data.get('exp_id')
             action = request.data.get('action')
             value = request.data.get('value')
-
+            method = request.data.get('method')
             queryset = Experiments.objects.filter(experiment_code=exp_code)
+            
             if(queryset.exists() == False):
                 return Response("Incorrect Experiment ID", status=status.HTTP_400_BAD_REQUEST)
-            else:
+
+            if(method == "status"):
+                print("Updating status")
+                if(value == "enter"):
+                    print("Entering")
+                    queryset.update(experiment_status=True)
+                else:
+                    print("Exiting")
+                    queryset.update(experiment_status=False)
+                return Response("Success", status=status.HTTP_200_OK)
+            
+            if(method == "blynk"):
                 key = queryset[0].experiment_key
                 header = "token="+key+"&"+action+"="+value
                 status_code = self.blynk.update_data(key, action, value)
